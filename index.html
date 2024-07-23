@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Revisão</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        input, button {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        td {
+            background-color: #fdfdfd;
+        }
+        tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+        .review-today {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Revisão</h1>
+        <label for="study-topic">Tópico de Estudo:</label>
+        <input type="text" id="study-topic" placeholder="Ex: Anatomia das Vias Biliares">
+        <button onclick="addStudy()">Adicionar Estudo</button>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Tópico</th>
+                    <th>Data do Estudo</th>
+                    <th>Revisão em 7 dias</th>
+                    <th>Revisão em 14 dias</th>
+                    <th>Revisão em 21 dias</th>
+                    <th>Revisão em 2 meses</th>
+                </tr>
+            </thead>
+            <tbody id="study-table">
+                <!-- Estudos serão inseridos aqui -->
+            </tbody>
+        </table>
+
+        <h2>Próximas Revisões</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tópico</th>
+                    <th>Data da Revisão</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="next-reviews-table">
+                <!-- Próximas revisões serão inseridas aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result.toLocaleDateString('pt-BR');
+        }
+
+        function addStudy() {
+            const topic = document.getElementById('study-topic').value;
+            if (!topic) {
+                alert('Por favor, insira um tópico de estudo.');
+                return;
+            }
+            
+            const studyDate = new Date();
+            const review7 = addDays(studyDate, 7);
+            const review14 = addDays(studyDate, 14);
+            const review21 = addDays(studyDate, 21);
+            const review60 = addDays(studyDate, 60);
+            
+            const table = document.getElementById('study-table');
+            const row = table.insertRow();
+            row.insertCell(0).innerText = topic;
+            row.insertCell(1).innerText = studyDate.toLocaleDateString('pt-BR');
+            row.insertCell(2).innerText = review7;
+            row.insertCell(3).innerText = review14;
+            row.insertCell(4).innerText = review21;
+            row.insertCell(5).innerText = review60;
+            
+            document.getElementById('study-topic').value = '';
+            updateNextReviews();
+        }
+
+        function updateNextReviews() {
+            const table = document.getElementById('study-table');
+            const nextReviewsTable = document.getElementById('next-reviews-table');
+            nextReviewsTable.innerHTML = '';
+            
+            const reviews = [];
+            const today = new Date().toLocaleDateString('pt-BR');
+            
+            for (let i = 0; i < table.rows.length; i++) {
+                const cells = table.rows[i].cells;
+                const topic = cells[0].innerText;
+                const reviewDates = [cells[2].innerText, cells[3].innerText, cells[4].innerText, cells[5].innerText];
+                reviewDates.forEach(date => {
+                    reviews.push({ topic, date });
+                });
+            }
+            
+            reviews.sort((a, b) => {
+                const dateA = a.date.split('/').reverse().join('');
+                const dateB = b.date.split('/').reverse().join('');
+                return dateA.localeCompare(dateB);
+            });
+            
+            const nextReviews = reviews.slice(0, 5);
+            nextReviews.forEach(review => {
+                const row = nextReviewsTable.insertRow();
+                const topicCell = row.insertCell(0);
+                const dateCell = row.insertCell(1);
+                const statusCell = row.insertCell(2);
+                
+                topicCell.innerText = review.topic;
+                dateCell.innerText = review.date;
+                
+                if (review.date === today) {
+                    statusCell.innerText = 'Revisar hoje';
+                    row.classList.add('review-today');
+                } else {
+                    statusCell.innerText = '';
+                }
+            });
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('studyData')) {
+                document.getElementById('study-table').innerHTML = localStorage.getItem('studyData');
+            }
+            updateNextReviews();
+        };
+
+        window.onbeforeunload = function() {
+            localStorage.setItem('studyData', document.getElementById('study-table').innerHTML);
+        };
+    </script>
+</body>
+</html>
