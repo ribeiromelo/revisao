@@ -5,21 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Revisão</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            color: white;
+        :root {
+            --background-light: #f0f0f0;
+            --background-dark: #121212;
+            --text-light: #333333;
+            --text-dark: #f0f0f0;
+            --card-light: #ffffff;
+            --card-dark: #1e1e1e;
+            --primary-light: #4CAF50;
+            --primary-dark: #81C784;
+            --highlight-light: #d4edda;
+            --highlight-dark: #33691e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--background-dark);
+                color: var(--text-dark);
+                font-family: sans-serif;
+            }
+            .container {
+                background-color: var(--card-dark);
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            }
+            button {
+                background-color: var(--primary-dark);
+            }
+            button:hover {
+                background-color: #66bb6a;
+            }
+            th {
+                background-color: #2e2e2e;
+            }
+            td {
+                background-color: var(--card-dark);
+            }
+            tr:nth-child(even) td {
+                background-color: #2e2e2e;
+            }
+            .review-today {
+                background-color: var(--highlight-dark);
+                color: var(--highlight-light);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: var(--background-light);
+                color: var(--text-light);
+            }
+            .container {
+                background-color: var(--card-light);
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            button {
+                background-color: var(--primary-light);
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            th {
+                background-color: #f4f4f4;
+            }
+            td {
+                background-color: var(--card-light);
+            }
+            tr:nth-child(even) td {
+                background-color: #f9f9f9;
+            }
+            .review-today {
+                background-color: var(--highlight-light);
+                color: #155724;
+            }
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
-            max-width: 800px;
-            margin: auto;
+            width: 100%;
+            max-width: 1200px;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
             border-radius: 8px;
         }
-        h1 {
+        h1, h2 {
             text-align: center;
-            color: #333333;
         }
         input, button {
             width: calc(100% - 22px);
@@ -30,13 +106,9 @@
             box-sizing: border-box;
         }
         button {
-            background-color: #4CAF50;
-            color: white;
             border: none;
             cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
+            color: white;
         }
         table {
             width: 100%;
@@ -47,20 +119,6 @@
             border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        td {
-            background-color: #fdfdfd;
-        }
-        tr:nth-child(even) td {
-            background-color: #f9f9f9;
-        }
-        .review-today {
-            background-color: #d4edda;
-            color: #155724;
-            font-weight: bold;
         }
     </style>
 </head>
