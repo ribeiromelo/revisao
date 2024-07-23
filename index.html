@@ -111,6 +111,17 @@
             padding: 12px;
             text-align: center;
         }
+        .delete-btn {
+            background-color: #ff4c4c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 5px 10px;
+        }
+        .delete-btn:hover {
+            background-color: #ff0000;
+        }
     </style>
 </head>
 <body>
@@ -129,6 +140,7 @@
                     <th>Revisão em 14 dias</th>
                     <th>Revisão em 21 dias</th>
                     <th>Revisão em 2 meses</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody id="study-table">
@@ -179,9 +191,64 @@
             row.insertCell(3).innerText = review14;
             row.insertCell(4).innerText = review21;
             row.insertCell(5).innerText = review60;
+            const deleteCell = row.insertCell(6);
+            const deleteButton = document.createElement('button');
+            deleteButton.innerText = 'Apagar';
+            deleteButton.className = 'delete-btn';
+            deleteButton.onclick = function() {
+                table.deleteRow(row.rowIndex - 1);
+                saveStudies();
+                updateNextReviews();
+            };
+            deleteCell.appendChild(deleteButton);
             
             document.getElementById('study-topic').value = '';
+            saveStudies();
             updateNextReviews();
+        }
+
+        function saveStudies() {
+            const table = document.getElementById('study-table');
+            const data = [];
+            for (let i = 0; i < table.rows.length; i++) {
+                const cells = table.rows[i].cells;
+                const studyData = {
+                    topic: cells[0].innerText,
+                    studyDate: cells[1].innerText,
+                    review7: cells[2].innerText,
+                    review14: cells[3].innerText,
+                    review21: cells[4].innerText,
+                    review60: cells[5].innerText
+                };
+                data.push(studyData);
+            }
+            localStorage.setItem('studyData', JSON.stringify(data));
+        }
+
+        function loadStudies() {
+            const data = JSON.parse(localStorage.getItem('studyData'));
+            if (data) {
+                const table = document.getElementById('study-table');
+                data.forEach(study => {
+                    const row = table.insertRow();
+                    row.insertCell(0).innerText = study.topic;
+                    row.insertCell(1).innerText = study.studyDate;
+                    row.insertCell(2).innerText = study.review7;
+                    row.insertCell(3).innerText = study.review14;
+                    row.insertCell(4).innerText = study.review21;
+                    row.insertCell(5).innerText = study.review60;
+                    const deleteCell = row.insertCell(6);
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerText = 'Apagar';
+                    deleteButton.className = 'delete-btn';
+                    deleteButton.onclick = function() {
+                        table.deleteRow(row.rowIndex - 1);
+                        saveStudies();
+                        updateNextReviews();
+                    };
+                    deleteCell.appendChild(deleteButton);
+                });
+            }
         }
 
         function updateNextReviews() {
@@ -227,14 +294,8 @@
         }
 
         window.onload = function() {
-            if (localStorage.getItem('studyData')) {
-                document.getElementById('study-table').innerHTML = localStorage.getItem('studyData');
-            }
+            loadStudies();
             updateNextReviews();
-        };
-
-        window.onbeforeunload = function() {
-            localStorage.setItem('studyData', document.getElementById('study-table').innerHTML);
         };
     </script>
 </body>
